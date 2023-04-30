@@ -21,7 +21,7 @@ app.post('/addUser', async (req, res) => {
         res.status(200).json(user);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: { message: error.message } });
+        res.status(200).json({ error: { message: error.message } });
     }
 })
 
@@ -34,7 +34,7 @@ app.get('/getActiveUserDetails', async (req, res) => {
             res.status(200).json({ error: { message: 'No active users found with email id ' + req.body.email } });
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: error.message });
+        res.status(200).json({ message: error.message });
     }
 })
 
@@ -44,7 +44,7 @@ app.post('/addBatch', async (req, res) => {
         res.status(200).json(batch);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: { message: error.message } });
+        res.status(200).json({ error: { message: error.message } });
     }
 })
 
@@ -57,7 +57,7 @@ app.get('/getActiveBatches', async (req, res) => {
             res.status(200).json({ error: { message: 'No active batches found!' } });
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: error.message });
+        res.status(200).json({ message: error.message });
     }
 })
 
@@ -67,7 +67,7 @@ app.post('/addMaterial', async (req, res) => {
         res.status(200).json(material);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: { message: error.message } });
+        res.status(200).json({ error: { message: error.message } });
     }
 })
 
@@ -80,6 +80,6 @@ app.post('/getMaterials', async (req, res) => {
             res.status(200).json({ error: { message: 'Materials found!!' } });
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: error.message });
+        res.status(200).json({ message: error.message });
     }
 })
