@@ -48,7 +48,7 @@ app.post('/addBatch', async (req, res) => {
     }
 })
 
-app.post('/getActiveBatches', async (req, res) => {
+app.get('/getActiveBatches', async (req, res) => {
     try {
         const batch = await Batch.find({ isActive: true });
         if (batch.length > 0)
@@ -71,13 +71,13 @@ app.post('/addMaterial', async (req, res) => {
     }
 })
 
-app.post('/getActiveMaterial', async (req, res) => {
+app.post('/getMaterials', async (req, res) => {
     try {
-        const materials = await Material.find({ isActive: true });
+        const materials = await Material.find(req.body);
         if (materials.length > 0)
             res.status(200).json(materials);
         else
-            res.status(200).json({ error: { message: 'No active batches found!' } });
+            res.status(200).json({ error: { message: 'Materials found!!' } });
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: error.message });
