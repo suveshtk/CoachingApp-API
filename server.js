@@ -25,11 +25,11 @@ app.post('/addUser', async (req, res) => {
     }
 })
 
-app.get('/getActiveUserDetails', async (req, res) => {
+app.post('/getActiveUserDetails', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email, isActive: true });
         if (user)
-            res.status(200).json(user);
+            res.status(200).json({ result : user } );
         else
             res.status(200).json({ error: { message: 'No active users found with email id ' + req.body.email } });
     } catch (error) {
@@ -52,7 +52,7 @@ app.get('/getActiveBatches', async (req, res) => {
     try {
         const batch = await Batch.find({ isActive: true });
         if (batch.length > 0)
-            res.status(200).json(batch);
+            res.status(200).json( { result : batch } );
         else
             res.status(200).json({ error: { message: 'No active batches found!' } });
     } catch (error) {
@@ -75,7 +75,7 @@ app.post('/getMaterials', async (req, res) => {
     try {
         const materials = await Material.find(req.body);
         if (materials.length > 0)
-            res.status(200).json(materials);
+            res.status(200).json( { result : materials } );
         else
             res.status(200).json({ error: { message: 'Materials found!!' } });
     } catch (error) {

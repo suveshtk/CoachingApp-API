@@ -19,7 +19,7 @@ const userSchema = mongoose.Schema({
         unique: true
     },
     phoneNo: {
-        type: Number,
+        type: String,
         required: [true, "Please enter a valid phone number"],
         unique: true
     },
