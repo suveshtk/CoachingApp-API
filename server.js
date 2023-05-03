@@ -4,8 +4,11 @@ const mongoose = require('mongoose');
 const User = require('./models/userModel.js');
 const Batch = require('./models/batchModel.js');
 const Material = require('./models/materialModel.js');
+const fileUpload = require("express-fileupload");
+const path = require("path");
 
 app.use(express.json());
+app.use(fileUpload());
 
 mongoose.connect('mongodb://localhost:27017/sciencetrack')
     .then(() => {
@@ -14,6 +17,10 @@ mongoose.connect('mongodb://localhost:27017/sciencetrack')
     }).catch((err) => {
         console.log(err)
     });
+
+app.get('/', async (req, res) => {
+    res.sendFile(__dirname+'/index.html');
+})
 
 app.post('/addUser', async (req, res) => {
     try {
@@ -61,8 +68,20 @@ app.get('/getActiveBatches', async (req, res) => {
     }
 })
 
-app.post('/addMaterial', async (req, res) => {
+app.post('/addMaterialVideo', async (req, res) => {
     try {
+        if(req.files) {
+            var file = req.files.file;
+            var newFileName = Date.now() + "_" + file.name;
+            file.mv('./uploads/' + newFileName,(error) => {
+                if(error){
+                    console.log(error);
+                    throw error;
+                }
+            });
+        } else {
+            throw new Error('Attachment not found!');
+        }
         const material = await Material.create(req.body);
         res.status(200).json(material);
     } catch (error) {
@@ -71,7 +90,7 @@ app.post('/addMaterial', async (req, res) => {
     }
 })
 
-app.post('/getMaterials', async (req, res) => {
+app.post('/getMaterialsVideo', async (req, res) => {
     try {
         const materials = await Material.find(req.body);
         if (materials.length > 0)
