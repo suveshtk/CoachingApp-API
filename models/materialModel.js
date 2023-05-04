@@ -8,21 +8,20 @@ const materialSchema = mongoose.Schema({
     },
     batches: [{
         type: String,
-        required: true
+        required:  [true, "Please choose valid batch(es)"]
     }],
     url: {
         type: String,
-        required: [true, "Please enter a valid url"]
+        required: [true, "Please enter a valid url"],
+        unique: true
     },
     title: {
         type: String,
         required: [true, "Please enter a valid title"],
-        unique: true
     },
     description: {
         type: String,
         required: [true, "Please enter a valid description"],
-        unique: true
     },
     isActive: {
         type: Boolean,

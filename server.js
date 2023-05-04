@@ -70,9 +70,10 @@ app.get('/getActiveBatches', async (req, res) => {
 
 app.post('/addMaterialVideo', async (req, res) => {
     try {
+        var newFileName;
         if(req.files) {
             var file = req.files.file;
-            var newFileName = Date.now() + "_" + file.name;
+            newFileName = Date.now() + "_" + file.name;
             file.mv('./uploads/' + newFileName,(error) => {
                 if(error){
                     console.log(error);
@@ -82,21 +83,30 @@ app.post('/addMaterialVideo', async (req, res) => {
         } else {
             throw new Error('Attachment not found!');
         }
+        req.body["url"] = '/uploads/' + newFileName;
+        var batchesArray = req.body.batches.split(",");
+        req.body["batches"] = batchesArray;
         const material = await Material.create(req.body);
-        res.status(200).json(material);
+        res.status(200).send("Material added successfully!");
     } catch (error) {
         console.log(error);
-        res.status(200).json({ error: { message: error.message } });
+        res.status(200).send(error.message)
     }
 })
 
-app.post('/getMaterialsVideo', async (req, res) => {
+app.post('/getMaterialsVideos', async (req, res) => {
     try {
-        const materials = await Material.find(req.body);
-        if (materials.length > 0)
-            res.status(200).json( { result : materials } );
-        else
-            res.status(200).json({ error: { message: 'Materials found!!' } });
+        const batch = await Batch.find({ name:req.body.name, isActive: true });
+        if(batch.length > 0)
+        {
+            const materials = await Material.find({ batches:req.body.name, materialType:req.body.materialType } ).sort({createdAt: -1});
+            if (materials.length > 0)
+                res.status(200).json( { result : materials } );
+            else
+                throw new Error('No Materials found!!');
+        } else {
+            throw new Error('No active batches found!!');
+        }
     } catch (error) {
         console.log(error)
         res.status(200).json({ message: error.message });
