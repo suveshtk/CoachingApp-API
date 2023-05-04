@@ -9,6 +9,7 @@ const path = require("path");
 
 app.use(express.json());
 app.use(fileUpload());
+app.use(express.static('uploads'));
 
 mongoose.connect('mongodb://localhost:27017/sciencetrack')
     .then(() => {
@@ -96,10 +97,20 @@ app.post('/addMaterialVideo', async (req, res) => {
 
 app.post('/getMaterialsVideos', async (req, res) => {
     try {
-        const batch = await Batch.find({ name:req.body.name, isActive: true });
+        var batch;
+        if(req.body.userType.toLowerCase == 'student')
+            batch = await Batch.find({ name:req.body.name, isActive: true });
+        else
+            batch = await Batch.find({ isActive: true });
+
         if(batch.length > 0)
         {
-            const materials = await Material.find({ batches:req.body.name, materialType:req.body.materialType } ).sort({createdAt: -1});
+            var materials;
+            if(req.body.userType.toLowerCase == 'student')
+                materials = await Material.find({ batches:req.body.name, materialType:req.body.materialType } ).sort({createdAt: -1});
+            else
+                materials = await Material.find({ materialType:req.body.materialType } ).sort({createdAt: -1});
+
             if (materials.length > 0)
                 res.status(200).json( { result : materials } );
             else
@@ -112,3 +123,9 @@ app.post('/getMaterialsVideos', async (req, res) => {
         res.status(200).json({ message: error.message });
     }
 })
+
+app.get('/uploads/:filename', function(req, res) {
+    var filename = req.params.filename;
+    var file = __dirname + '/uploads/' + filename;
+    res.sendFile(file);
+  });
