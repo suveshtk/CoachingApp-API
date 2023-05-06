@@ -7,7 +7,7 @@ const Material = require('./models/materialModel.js');
 const fileUpload = require("express-fileupload");
 const path = require("path");
 const { OAuth2Client } = require('google-auth-library');
-const CLIENT_ID = 'REPLACE_WITH_VALID_TOKEN';
+const CLIENT_ID = process.env.CLIENT_ID;
 const client = new OAuth2Client(CLIENT_ID);
 
 app.use(express.json());
@@ -101,7 +101,6 @@ app.post('/addMaterialVideo', async (req, res) => {
         }
 
         var newFileName;
-        console.log(req);
         if(req.files) {
             var file = req.files.file;
             newFileName = Date.now() + "_" + file.name;
