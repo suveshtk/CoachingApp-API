@@ -60,6 +60,25 @@ app.post('/getActiveUserDetails', async (req, res) => {
     }
 })
 
+app.post('/getAllActiveUsers', async (req, res) => {
+    try {
+        const isAuthenticated = await verifyUserAuthentication(req);
+        if (!isAuthenticated) {
+            throw new Error('User authentication failed');
+        }
+        
+        var users = await User.find({ isActive: true } ).sort({createdAt: -1});
+
+        if (users.length > 0)
+            res.status(200).json( { result : users } );
+        else
+            throw new Error('No Materials found!!');
+    } catch (error) {
+        console.log(error)
+        res.status(200).json({ message: error.message });
+    }
+})
+
 app.post('/addBatch', async (req, res) => {
     try {
         const isAuthenticated = await verifyUserAuthentication(req);
@@ -75,7 +94,7 @@ app.post('/addBatch', async (req, res) => {
     }
 })
 
-app.get('/getActiveBatches', async (req, res) => {
+app.get('/getAllActiveBatches', async (req, res) => {
     try {
         const isAuthenticated = await verifyUserAuthentication(req);
         if (!isAuthenticated) {
@@ -124,7 +143,26 @@ app.post('/addMaterialVideo', async (req, res) => {
     }
 })
 
-app.post('/getMaterialsVideos', async (req, res) => {
+app.post('/getAllActiveMaterials', async (req, res) => {
+    try {
+        const isAuthenticated = await verifyUserAuthentication(req);
+        if (!isAuthenticated) {
+            throw new Error('User authentication failed');
+        }
+        
+        var materials = await Material.find({ isActive: true } ).sort({createdAt: -1});
+
+        if (materials.length > 0)
+            res.status(200).json( { result : materials } );
+        else
+            throw new Error('No Materials found!!');
+    } catch (error) {
+        console.log(error)
+        res.status(200).json({ message: error.message });
+    }
+})
+
+app.post('/getMaterialsVideosBasedOnBatch', async (req, res) => {
     try {
         const isAuthenticated = await verifyUserAuthentication(req);
         if (!isAuthenticated) {
@@ -141,9 +179,9 @@ app.post('/getMaterialsVideos', async (req, res) => {
         {
             var materials;
             if(req.body.userType.toLowerCase == 'student')
-                materials = await Material.find({ batches:req.body.name, materialType:req.body.materialType } ).sort({createdAt: -1});
+                materials = await Material.find({ batches:req.body.name, materialType:req.body.materialType, isActive: true } ).sort({createdAt: -1});
             else
-                materials = await Material.find({ materialType:req.body.materialType } ).sort({createdAt: -1});
+                materials = await Material.find({ materialType:req.body.materialType, isActive: true } ).sort({createdAt: -1});
 
             if (materials.length > 0)
                 res.status(200).json( { result : materials } );
