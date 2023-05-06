@@ -23,6 +23,10 @@ const materialSchema = mongoose.Schema({
         type: String,
         required: [true, "Please enter a valid description"],
     },
+    createdBy: {
+        type: String,
+        required: false
+    },
     isActive: {
         type: Boolean,
         required: false,
