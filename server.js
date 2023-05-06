@@ -170,7 +170,7 @@ app.post('/getMaterialsVideosBasedOnBatch', async (req, res) => {
         }
         
         var batch;
-        if(req.body.userType.toLowerCase == 'student')
+        if(req.body.userType.toLowerCase() == 'student')
             batch = await Batch.find({ name:req.body.name, isActive: true });
         else
             batch = await Batch.find({ isActive: true });
@@ -178,7 +178,7 @@ app.post('/getMaterialsVideosBasedOnBatch', async (req, res) => {
         if(batch.length > 0)
         {
             var materials;
-            if(req.body.userType.toLowerCase == 'student')
+            if(req.body.userType.toLowerCase() == 'student')
                 materials = await Material.find({ batches:req.body.name, materialType:req.body.materialType, isActive: true } ).sort({createdAt: -1});
             else
                 materials = await Material.find({ materialType:req.body.materialType, isActive: true } ).sort({createdAt: -1});
