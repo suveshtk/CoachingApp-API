@@ -132,7 +132,7 @@ app.get('/getAllActiveBatches', async (req, res) => {
             res.status(200).json({ error: { message: 'No active batches found!' } });
     } catch (error) {
         console.log(error)
-        res.status(200).json({ message: error.message });
+        res.status(200).json({ error: { message: error.message } });
     }
 })
 
@@ -212,9 +212,29 @@ app.post('/getAllActiveMaterials', async (req, res) => {
             throw new Error('No Materials found!!');
     } catch (error) {
         console.log(error)
-        res.status(200).json({ message: error.message });
+        res.status(200).json({ error: { message: error.message } });
     }
 })
+
+app.delete('/material/:id', async (req, res) => {
+    try {
+
+        const isAuthenticated = await verifyUserAuthentication(req);
+        if (!isAuthenticated) {
+            throw new Error('User authentication failed');
+        }
+
+        const deletedMaterial = await Material.findOneAndDelete({ title: req.params.id });
+        if (!deletedMaterial) {
+            return res.status(200).send('Material not found!');
+        }
+    
+        return res.status(200).send('Material deleted successfully - ' + req.params.id);
+    } catch (error) {
+        console.error('Error deleting material:', error);
+        res.status(200).send(error.message);
+    }
+});
 
 app.post('/getMaterialsVideosBasedOnBatch', async (req, res) => {
     try {
