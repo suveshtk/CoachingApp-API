@@ -116,6 +116,26 @@ app.get('/getAllActiveBatches', async (req, res) => {
     }
 })
 
+app.delete('/batch/:id', async (req, res) => {
+    try {
+
+        const isAuthenticated = await verifyUserAuthentication(req);
+        if (!isAuthenticated) {
+            throw new Error('User authentication failed');
+        }
+
+        const deletedBatch = await Batch.findOneAndDelete({ name: req.params.id });
+        if (!deletedBatch) {
+            return res.status(200).send('Batch not found!');
+        }
+    
+        return res.status(200).send('Batch deleted successfully - ' + req.params.id);
+    } catch (error) {
+        console.error('Error deleting batch:', error);
+        res.status(200).send(error.message);
+    }
+});
+
 app.post('/addMaterialVideo', async (req, res) => {
     try {
         const isAuthenticated = await verifyUserAuthentication(req);
