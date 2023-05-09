@@ -64,6 +64,26 @@ app.post('/getActiveUserDetails', async (req, res) => {
     }
 })
 
+app.delete('/user/:id', async (req, res) => {
+    try {
+
+        const isAuthenticated = await verifyUserAuthentication(req);
+        if (!isAuthenticated) {
+            throw new Error('User authentication failed');
+        }
+
+        const deletedUser = await User.findOneAndDelete({ email: req.params.id });
+        if (!deletedUser) {
+            return res.status(200).send('User not found!');
+        }
+    
+        return res.status(200).send('User deleted successfully - ' + req.params.id);
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(200).send(error.message);
+    }
+});
+
 app.post('/getAllActiveUsers', async (req, res) => {
     try {
         const isAuthenticated = await verifyUserAuthentication(req);
@@ -79,7 +99,7 @@ app.post('/getAllActiveUsers', async (req, res) => {
             throw new Error('No Materials found!!');
     } catch (error) {
         console.log(error)
-        res.status(200).json({ message: error.message });
+        res.status(200).json({ error: { message: error.message } });
     }
 })
 
