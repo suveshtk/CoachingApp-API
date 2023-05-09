@@ -7,12 +7,16 @@ const Material = require('./models/materialModel.js');
 const fileUpload = require("express-fileupload");
 const path = require("path");
 const { OAuth2Client } = require('google-auth-library');
+const ffmpeg = require('fluent-ffmpeg');
+const { spawn } = require('child_process');
+
 const CLIENT_ID = process.env.CLIENT_ID;
 const client = new OAuth2Client(CLIENT_ID);
 
 app.use(express.json());
 app.use(fileUpload());
 app.use(express.static('uploads'));
+app.use(express.static('thumbnails'));
 
 
 mongoose.connect('mongodb://localhost:27017/sciencetrack')
@@ -119,20 +123,30 @@ app.post('/addMaterialVideo', async (req, res) => {
             throw new Error('User authentication failed');
         }
 
-        var newFileName;
+        var newFileName, thumbnailName, thumbnailPath;
         if(req.files) {
             var file = req.files.file;
-            newFileName = Date.now() + "_" + file.name;
-            file.mv('./uploads/' + newFileName,(error) => {
-                if(error){
-                    console.log(error);
-                    throw error;
-                }
-            });
+            newFilePath = './uploads/' + Date.now() + "_" + file.name;
+            thumbnailPath = './thumbnails/' + Date.now() + '_Thumbnail.jpg';
+
+            // Move the uploaded file to the desired location
+            await moveFile(file, newFilePath);
+
+            // Generate thumbnail
+            if(req.body.materialType.toLowerCase() == 'video') {
+                thumbnailSavedPath = await createThumbnail(newFilePath, thumbnailPath);
+            }
+
         } else {
             throw new Error('Attachment not found!');
         }
-        req.body["url"] = '/uploads/' + newFileName;
+
+        req.body["url"] = newFilePath;
+        if(req.body.materialType.toLowerCase() == 'video') {
+            req.body["thumbnail"] = thumbnailSavedPath;
+        } else {
+            req.body["thumbnail"] = null;
+        }
         var batchesArray = req.body.batches.split(",");
         req.body["batches"] = batchesArray;
         const material = await Material.create(req.body);
@@ -202,6 +216,12 @@ app.get('/uploads/:filename', function(req, res) {
     res.sendFile(file);
 });
 
+app.get('/thumbnails/:filename', function(req, res) {
+    var filename = req.params.filename;
+    var file = __dirname + '/thumbnails/' + filename;
+    res.sendFile(file);
+});
+
 async function verifyUserAuthentication(req) {
     const { authorization } = req.headers;
     
@@ -228,4 +248,54 @@ async function verifyUserAuthentication(req) {
       console.error('Error verifying user authentication:', error);
       return false; // Authentication failed
     }
+}
+
+function moveFile(file, filePath) {
+    return new Promise((resolve, reject) => {
+        file.mv(filePath,(error) => {
+            if(error){
+                console.log(error);
+                reject(error);
+            } else{
+                resolve();
+            }
+        });
+    });
+  }
+
+function createThumbnail (videoPath, filename) {
+    return new Promise((resolve, reject) => {
+        const ffmpeg = spawn('ffmpeg', [
+            '-i',
+            videoPath,
+            '-ss',
+            '00:00:02', // Set the time offset for the thumbnail (e.g., 5 seconds)
+            '-vframes',
+            '1', // Set the number of frames to capture
+            '-vf',
+            'scale=320:-1', // Set the dimensions of the thumbnail (e.g., width: 320px, maintain aspect ratio)
+            filename,
+        ]);
+    
+        ffmpeg.stderr.on('data', (data) => {
+            // console.log(`ffmpeg stderr: ${data}`);
+        });
+        
+        ffmpeg.on('message', (message) => {
+            // console.log(`ffmpeg message: ${message}`);
+        });
+    
+        ffmpeg.on('close', (code) => {
+            if (code === 0) {
+                console.log('Thumbnail generation completed successfully');
+                resolve(filename);
+            } else {
+                reject(new Error(`Thumbnail generation failed with code ${code}`));
+            }
+        });
+    
+        ffmpeg.on('error', (error) => {
+            reject(error);
+        });
+    });
   }

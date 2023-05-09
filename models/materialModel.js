@@ -19,6 +19,10 @@ const materialSchema = mongoose.Schema({
         type: String,
         required: [true, "Please enter a valid title"],
     },
+    thumbnail: {
+        type: String,
+        required: false
+    },
     description: {
         type: String,
         required: [true, "Please enter a valid description"],

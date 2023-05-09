@@ -1,4 +1,6 @@
 node_modules
 package-lock.json
 uploads
-
+.DS_Store
+thumbnails
+.DS_Store
