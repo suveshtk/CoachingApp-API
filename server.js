@@ -1,9 +1,9 @@
 const express = require('express')
 const app = express()
 // const mongoose = require('mongoose');
-const User = require('./models/userModel.js');
-const Batch = require('./models/batchModel.js');
-const Material = require('./models/materialModel.js');
+// const User = require('./models/userModel.js');
+// const Batch = require('./models/batchModel.js');
+// const Material = require('./models/materialModel.js');
 const fileUpload = require("express-fileupload");
 const path = require("path");
 const { OAuth2Client } = require('google-auth-library');
