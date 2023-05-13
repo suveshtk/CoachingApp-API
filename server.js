@@ -26,7 +26,7 @@ app.use(express.static('thumbnails'));
 //     }).catch((err) => {
 //         console.log(err)
 //     });
-
+app.listen(3000);
 app.get('/', async (req, res) => {
     res.sendFile(__dirname+'/index.html');
 })
