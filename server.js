@@ -9,6 +9,7 @@ const path = require("path");
 const { OAuth2Client } = require('google-auth-library');
 const ffmpeg = require('fluent-ffmpeg');
 const { spawn } = require('child_process');
+var fs = require('fs');
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const client = new OAuth2Client(CLIENT_ID);
@@ -227,6 +228,10 @@ app.delete('/material/:id', async (req, res) => {
         const deletedMaterial = await Material.findOneAndDelete({ title: req.params.id });
         if (!deletedMaterial) {
             return res.status(200).send('Material not found!');
+        } else {
+            fs.unlinkSync(deletedMaterial.url);
+            if(deletedMaterial.materialType.toLowerCase() == 'video')
+                fs.unlinkSync(deletedMaterial.thumbnail);
         }
     
         return res.status(200).send('Material deleted successfully - ' + req.params.id);
