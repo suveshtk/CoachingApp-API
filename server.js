@@ -19,7 +19,7 @@ app.use(express.static('uploads'));
 app.use(express.static('thumbnails'));
 
 
-mongoose.connect('mongodb://localhost:27017/sciencetrack')
+mongoose.connect('mongodb://127.0.0.1:27017/sciencetrack')
     .then(() => {
         console.log('Connected!');
         app.listen(3000);
