@@ -61,7 +61,7 @@ app.post('/getActiveUserDetails', async (req, res) => {
             res.status(200).json({ error: { message: 'No active users found with email id ' + req.body.email } });
     } catch (error) {
         console.log(error)
-        res.status(200).json({ message: error.message });
+        res.status(200).json({ error: { message: error.message } });
     }
 })
 
